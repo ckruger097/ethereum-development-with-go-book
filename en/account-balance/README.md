@@ -17,6 +17,7 @@ fmt.Println(balance) // 25893180161173005034
 ```
 
 Passing the block number let's you read the account balance at the time of that block. The block number must be a `big.Int`.
+You may not be able to retrieve balances from a block that has been mined in the past due to your endpoint not having [archival node](https://www.quicknode.com/guides/infrastructure/ethereum-full-node-vs-archive-node) access. Archival nodes require greater storage space in order to search through the entire history of Ethereum transactions, and thus are either paid for or run independently; some free archival node endpoints do exist for independent developers such as those on [pokt.network](https://pokt.network), but a regular endpoint through Infura/Alchemy is sufficient for these examples. 
 
 ```go
 blockNumber := big.NewInt(5532993)

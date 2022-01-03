@@ -53,6 +53,8 @@ ganache-cli -m "much repair shock carbon improve miss forget sock include bullet
 
 I highly recommend getting familiar with ganache by reading their [documentation](http://truffleframework.com/ganache/).
 
+For these exercises, you may choose to either work on a local network (using ganache-cli) or through a free testnet gateway such as Infura. The difference between the two is that a testnet (such as Rinkeby or Kovan) is much closer to the actual Ethereum mainnet, as its transactions are mined by actual miners, thus requiring testnet ETH to use. This is not "real" ETH and does not cost money, instead these test networks use "testnet" ETH that is available at various
+[faucets](https://faucet.rinkeby.io/). These faucets deposit a small amount (up to 1 ETH/day) of testnet Ether and are not always available at any given time. One advantage to using testnets is that other individuals or organizations outside your local network can interact with your smart contracts/dApps in the same way as they would on the Ethereum mainnet. 
 ---
 
 ### Full code

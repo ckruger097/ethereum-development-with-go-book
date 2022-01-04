@@ -8,13 +8,14 @@ In the [previous section](../block-query) we learned how to read a block and all
 
 ```go
 for _, tx := range block.Transactions() {
-  fmt.Println(tx.Hash().Hex())        // 0x5d49fcaa394c97ec8a9c3e7bd9e8388d420fb050a52083ca52ff24b3b65bc9c2
-  fmt.Println(tx.Value().String())    // 10000000000000000
-  fmt.Println(tx.Gas())               // 105000
-  fmt.Println(tx.GasPrice().Uint64()) // 102000000000
-  fmt.Println(tx.Nonce())             // 110644
-  fmt.Println(tx.Data())              // []
-  fmt.Println(tx.To().Hex())          // 0x55fE59D8Ad77035154dDd0AD0388D09Dd4047A8e
+  fmt.Println("Transaction information:")
+  fmt.Println(tx.Hash().Hex())        // 0x7e7021d688f2e837f0c72726a12f0262cf5379b53d69c9ec71b98e83b2738b25
+  fmt.Println(tx.Value().String())    // 0
+  fmt.Println(tx.Gas())               // 1000000
+  fmt.Println(tx.GasPrice().Uint64()) // 2500000020
+  fmt.Println(tx.Nonce())             // 6
+  fmt.Println(tx.Data())              // [ 166 209 253 255 0 ... 0 ]
+  fmt.Println(tx.To().Hex())          // 0x39a4D265db942361D92e2B0039cae73Ea72a2ff9
 }
 ```
 
@@ -23,11 +24,11 @@ In order to read the sender address, we need to call `AsMessage` on the transact
 ```go
 chainID, err := client.NetworkID(context.Background())
 if err != nil {
-  log.Fatal(err)
+	log.Fatal(err)
 }
 
-if msg, err := tx.AsMessage(types.NewEIP155Signer(chainID)); err == nil {
-  fmt.Println(msg.From().Hex()) // 0x0fD081e3Bb178dc45c0cb23202069ddA57064258
+if msg, err := tx.AsMessage(types.NewLondonSigner(chainID), tx.GasPrice()); err == nil {
+	fmt.Println(msg.From().Hex()) // 0xfCA5fAFf601f73C6FA9105BAc6B10B75F6595108
 }
 ```
 
@@ -46,7 +47,7 @@ fmt.Println(receipt.Logs) // ...
 Another way to iterate over transaction without fetching the block is to call the client's `TransactionInBlock` method. This method accepts only the block hash and the index of the transaction within the block. You can call `TransactionCount` to know how many transactions there are in the block.
 
 ```go
-blockHash := common.HexToHash("0x9e8751ebb5069389b855bba72d94902cc385042661498a415979b7b6ee9ba4b9")
+blockHash := common.HexToHash("0x0cefcb3c3d24adaffd21cb68715d8cff093129568d857d3a52d3b851c59698c7")
 count, err := client.TransactionCount(context.Background(), blockHash)
 if err != nil {
   log.Fatal(err)
@@ -58,20 +59,20 @@ for idx := uint(0); idx < count; idx++ {
     log.Fatal(err)
   }
 
-  fmt.Println(tx.Hash().Hex()) // 0x5d49fcaa394c97ec8a9c3e7bd9e8388d420fb050a52083ca52ff24b3b65bc9c2
+  fmt.Println(tx.Hash().Hex()) // 0x7e7021d688f2e837f0c72726a12f0262cf5379b53d69c9ec71b98e83b2738b25
 }
 ```
 
 You can also query for a single transaction directly given the transaction hash by using `TransactionByHash`.
 
 ```go
-txHash := common.HexToHash("0x5d49fcaa394c97ec8a9c3e7bd9e8388d420fb050a52083ca52ff24b3b65bc9c2")
+txHash := common.HexToHash("0x7e7021d688f2e837f0c72726a12f0262cf5379b53d69c9ec71b98e83b2738b25")
 tx, isPending, err := client.TransactionByHash(context.Background(), txHash)
 if err != nil {
   log.Fatal(err)
 }
 
-fmt.Println(tx.Hash().Hex()) // 0x5d49fcaa394c97ec8a9c3e7bd9e8388d420fb050a52083ca52ff24b3b65bc9c2
+fmt.Println(tx.Hash().Hex()) // 0x7e7021d688f2e837f0c72726a12f0262cf5379b53d69c9ec71b98e83b2738b25
 fmt.Println(isPending)       // false
 ```
 
@@ -101,28 +102,29 @@ func main() {
 		log.Fatal(err)
 	}
 
-	blockNumber := big.NewInt(5671744)
+	blockNumber := big.NewInt(9930480)
 	block, err := client.BlockByNumber(context.Background(), blockNumber)
+	fmt.Println(block.Hash().Hex())
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	for _, tx := range block.Transactions() {
-		fmt.Println(tx.Hash().Hex())        // 0x5d49fcaa394c97ec8a9c3e7bd9e8388d420fb050a52083ca52ff24b3b65bc9c2
-		fmt.Println(tx.Value().String())    // 10000000000000000
-		fmt.Println(tx.Gas())               // 105000
-		fmt.Println(tx.GasPrice().Uint64()) // 102000000000
-		fmt.Println(tx.Nonce())             // 110644
-		fmt.Println(tx.Data())              // []
-		fmt.Println(tx.To().Hex())          // 0x55fE59D8Ad77035154dDd0AD0388D09Dd4047A8e
+		fmt.Println("Transaction information:")
+		fmt.Println(tx.Hash().Hex())        // 0x7e7021d688f2e837f0c72726a12f0262cf5379b53d69c9ec71b98e83b2738b25
+		fmt.Println(tx.Value().String())    // 0
+		fmt.Println(tx.Gas())               // 1000000
+		fmt.Println(tx.GasPrice().Uint64()) // 2500000020
+		fmt.Println(tx.Nonce())             // 6
+		fmt.Println(tx.Data())              // [ 166 209 253 255 0 ... 0 ]
+		fmt.Println(tx.To().Hex())          // 0x39a4D265db942361D92e2B0039cae73Ea72a2ff9
 
 		chainID, err := client.NetworkID(context.Background())
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		if msg, err := tx.AsMessage(types.NewEIP155Signer(chainID)); err == nil {
-			fmt.Println(msg.From().Hex()) // 0x0fD081e3Bb178dc45c0cb23202069ddA57064258
+		if msg, err := tx.AsMessage(types.NewLondonSigner(chainID), tx.GasPrice()); err == nil {
+			fmt.Println(msg.From().Hex()) // 0xfCA5fAFf601f73C6FA9105BAc6B10B75F6595108
 		}
 
 		receipt, err := client.TransactionReceipt(context.Background(), tx.Hash())
@@ -133,7 +135,7 @@ func main() {
 		fmt.Println(receipt.Status) // 1
 	}
 
-	blockHash := common.HexToHash("0x9e8751ebb5069389b855bba72d94902cc385042661498a415979b7b6ee9ba4b9")
+	blockHash := common.HexToHash("0x0cefcb3c3d24adaffd21cb68715d8cff093129568d857d3a52d3b851c59698c7")
 	count, err := client.TransactionCount(context.Background(), blockHash)
 	if err != nil {
 		log.Fatal(err)
@@ -145,16 +147,16 @@ func main() {
 			log.Fatal(err)
 		}
 
-		fmt.Println(tx.Hash().Hex()) // 0x5d49fcaa394c97ec8a9c3e7bd9e8388d420fb050a52083ca52ff24b3b65bc9c2
+		fmt.Println(tx.Hash().Hex()) // 0x7e7021d688f2e837f0c72726a12f0262cf5379b53d69c9ec71b98e83b2738b25
 	}
 
-	txHash := common.HexToHash("0x5d49fcaa394c97ec8a9c3e7bd9e8388d420fb050a52083ca52ff24b3b65bc9c2")
+	txHash := common.HexToHash("0x7e7021d688f2e837f0c72726a12f0262cf5379b53d69c9ec71b98e83b2738b25")
 	tx, isPending, err := client.TransactionByHash(context.Background(), txHash)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(tx.Hash().Hex()) // 0x5d49fcaa394c97ec8a9c3e7bd9e8388d420fb050a52083ca52ff24b3b65bc9c2
+	fmt.Println(tx.Hash().Hex()) // 0x7e7021d688f2e837f0c72726a12f0262cf5379b53d69c9ec71b98e83b2738b25
 	fmt.Println(isPending)       // false
 }
 ```
